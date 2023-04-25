@@ -1,25 +1,28 @@
 #ifndef PESTO_HPP
 #define PESTO_HPP
 
-#include "gfx/render.hpp"
+#include "gfx/renderer.hpp"
 #include "time.hpp"
 #include "window/window.hpp"
 #include "input/input.hpp"
+#include "loader/loader.hpp"
+
 #include <iostream>
 
 #define DEFAULT_WINDOW_WIDTH 1280
 #define DEFAULT_WINDOW_HEIGHT 720
 
-
 struct Application
 {
     WindowHandle windowHandle {this, DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT};
     Renderer renderer {this};
+	Loader loader {};
 	Input input {this};
     Time time {};
 
     Application ()
     {
+		// Loop
         while (!glfwWindowShouldClose(windowHandle.window))
         {
             // Beginning

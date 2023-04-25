@@ -1,8 +1,18 @@
-set(BGFX_BUILD_EXAMPLES OFF)
-
+# BGFX
+set(BGFX_BUILD_TOOLS     ON  CACHE INTERNAL "")
+set(BGFX_BUILD_EXAMPLES  OFF CACHE INTERNAL "")
+set(BGFX_CUSTOM_TARGETS  OFF CACHE INTERNAL "")
 add_subdirectory(bgfx.cmake)
-add_subdirectory(glfw)
-add_subdirectory(glm)
 
-target_include_directories(${PROJECT_NAME} PUBLIC glfw/include glm)
-target_link_libraries(${PROJECT_NAME} PUBLIC bgfx bx bimg_decode bimg glfw)
+# GLFW
+set(GLFW_BUILD_EXAMPLES  OFF CACHE INTERNAL "")
+set(GLFW_BUILD_TESTS     OFF CACHE INTERNAL "")
+set(GLFW_BUILD_DOCS      OFF CACHE INTERNAL "")
+set(GLFW_INSTALL         OFF CACHE INTERNAL "")
+add_subdirectory(glfw)
+
+# GLM
+set(GLM_TEST_ENABLE      OFF CACHE INTERNAL "")
+set(BUILD_SHARED_LIBS    OFF CACHE INTERNAL "")
+set(BUILD_STATIC_LIBS    OFF CACHE INTERNAL "")
+add_subdirectory(glm)
