@@ -17,7 +17,7 @@ struct Renderer
 {
     Application *app;
 
-    Renderer(Application *mainApp);
+    explicit Renderer(Application *mainApp);
 
     void initializeBgfx();
 
@@ -26,8 +26,11 @@ struct Renderer
 
     VertexLayout spriteVL; // 2D Vertex Layout
     VertexLayout meshVL;   // 3D Vertex Layout
-	
-	ProgramHandle shader;
+
+    VertexBufferHandle vbh;
+    IndexBufferHandle ibh;
+
+    ProgramHandle shader;
 };
 
 struct Util
@@ -62,4 +65,4 @@ static const uint16_t cubeTriList[] = {
     0, 1, 2, 1, 3, 2, 4, 6, 5, 5, 6, 7, 0, 2, 4, 4, 2, 6, 1, 5, 3, 5, 7, 3, 0, 4, 1, 4, 5, 1, 2, 3, 6, 6, 3, 7,
 };
 
-#endif // DEBUG
+#endif // RENDER_HPP

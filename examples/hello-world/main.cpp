@@ -2,6 +2,8 @@
 
 #include "GLFW/glfw3.h"
 #include "pesto.hpp"
+#include "util.hpp"
+
 
 #include "shaders/sprite/sprite.fs.hpp"
 #include "shaders/sprite/sprite.vs.hpp"
@@ -30,8 +32,12 @@ void Application::update()
 
 void Application::tick()
 {
+    DEBUG_MILLISECONDS("FRAME: ", this->time.delta, 0);
+    DEBUG_NUMBER("DRAW CALL: ", bgfx::getStats()->numDraw, 1);
 }
 
 void Application::draw()
 {
+
+
 }

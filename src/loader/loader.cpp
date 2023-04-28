@@ -1,7 +1,7 @@
 #include "loader.hpp"
 #include "bgfx/bgfx.h"
 #include "pesto.hpp"
-#include <filesystem>
+
 #include <ostream>
 #include <string>
 

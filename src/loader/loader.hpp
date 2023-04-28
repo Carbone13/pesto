@@ -29,12 +29,10 @@ struct Loader
                                     bgfx::TextureInfo *_info, bimg::Orientation::Enum *_orientation);
     void unload(void *_ptr);
 
-
   public:
-    
-	const char* generatedDirectory;
+    const char *generatedDirectory;
 
-	Loader()
+    Loader()
     {
         fileReader = BX_NEW(g_allocator, bx::FileReader);
     }
@@ -43,11 +41,11 @@ struct Loader
                                     uint8_t _skip = 0, bgfx::TextureInfo *_info = nullptr,
                                     bimg::Orientation::Enum *_orientation = NULL);
 
-	bgfx::ShaderHandle loadShader(const char* _name);
-	bgfx::ProgramHandle loadProgram (const char *PROGRAM);
+    bgfx::ShaderHandle loadShader(const char *_name);
+    bgfx::ProgramHandle loadProgram(const char *PROGRAM);
 
-	const bgfx::Memory* loadMem(const char* _filePath);
-	void *loadMem(const char* _filePath, uint32_t* _size);
+    const bgfx::Memory *loadMem(const char *_filePath);
+    void *loadMem(const char *_filePath, uint32_t *_size);
 };
 
 #endif // PESTO_LOADER_HPP

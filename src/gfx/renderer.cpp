@@ -17,10 +17,16 @@ Renderer::Renderer(Application *mainApp)
     spriteVL.add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Int16, true, true);
     spriteVL.end();
 
-    meshVL.begin();
-    meshVL.add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float);
-    meshVL.add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Int16, true, true);
-    meshVL.end();
+//    meshVL.begin();
+//    meshVL.add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float);
+//    meshVL.add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Int16, true, true);
+//    meshVL.end();
+    meshVL.begin()
+        .add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
+        .add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true)
+        .end();
+
+
 }
 
 void Renderer::initializeBgfx()
@@ -53,15 +59,8 @@ void Renderer::prepare()
 
 void Renderer::submit()
 {
-
-    bgfx::VertexLayout pcvDecl;
-    pcvDecl.begin()
-        .add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
-        .add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true)
-        .end();
-
-    auto vbh = bgfx::createVertexBuffer(bgfx::makeRef(cubeVertices, sizeof(cubeVertices)), pcvDecl);
-    auto ibh = bgfx::createIndexBuffer(bgfx::makeRef(cubeTriList, sizeof(cubeTriList)));
+    vbh = bgfx::createVertexBuffer(bgfx::makeRef(cubeVertices, sizeof(cubeVertices)), meshVL);
+    ibh = bgfx::createIndexBuffer(bgfx::makeRef(cubeTriList, sizeof(cubeTriList)));
 
     const bx::Vec3 at = {0.0f, 0.0f, 0.0f};
     const bx::Vec3 eye = {0.0f, 0.0f, -5.0f};
@@ -88,4 +87,7 @@ void Renderer::submit()
     bgfx::submit(0, shader);
 
     bgfx::frame();
+
+    destroy(vbh);
+    destroy(ibh);
 }
