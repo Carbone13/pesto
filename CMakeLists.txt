@@ -6,6 +6,9 @@ project(pesto)
 
 add_subdirectory(lib)
 
+include_directories(lib/bgfx.cmake/bgfx/include lib/bgfx.cmake/bx/include lib/bgfx.cmake/bimg/include)
+include_directories(lib/glfw/include lib/glm)
+
 # PESTO
 file(GLOB_RECURSE SOURCES src/*.cpp)
 file(GLOB_RECURSE HEADERS src/*.hpp src/*.h)
