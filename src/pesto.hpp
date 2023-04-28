@@ -2,10 +2,10 @@
 #define PESTO_HPP
 
 #include "gfx/renderer.hpp"
-#include "time.hpp"
-#include "window/window.hpp"
 #include "input/input.hpp"
 #include "loader/loader.hpp"
+#include "time.hpp"
+#include "window/window.hpp"
 
 #include <iostream>
 
@@ -14,15 +14,17 @@
 
 struct Application
 {
-    WindowHandle windowHandle {this, DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT};
-    Renderer renderer {this};
-	Loader loader {};
-	Input input {this};
-    Time time {};
+    WindowHandle windowHandle{this, DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT};
+    Renderer renderer{this};
+    Loader loader{};
+    Input input{this};
+    Time time{};
 
-    Application ()
+    Application() = default;
+
+    void run()
     {
-		// Loop
+        // Loop
         while (!glfwWindowShouldClose(windowHandle.window))
         {
             // Beginning
@@ -50,6 +52,10 @@ struct Application
     virtual void tick();
     virtual void draw();
 
+    void close() const
+    {
+        glfwSetWindowShouldClose(windowHandle.window, 1); // exit
+    }
 };
 
 #endif // !PESTO_HPP

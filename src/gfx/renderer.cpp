@@ -1,7 +1,9 @@
+#include "GLFW/glfw3.h"
+#include "bgfx/bgfx.h"
 #define GLFW_EXPOSE_NATIVE_WIN32
 
-#include "renderer.hpp"
 #include "pesto.hpp"
+#include "renderer.hpp"
 
 #include <iostream>
 
@@ -51,5 +53,39 @@ void Renderer::prepare()
 
 void Renderer::submit()
 {
+
+    bgfx::VertexLayout pcvDecl;
+    pcvDecl.begin()
+        .add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
+        .add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true)
+        .end();
+
+    auto vbh = bgfx::createVertexBuffer(bgfx::makeRef(cubeVertices, sizeof(cubeVertices)), pcvDecl);
+    auto ibh = bgfx::createIndexBuffer(bgfx::makeRef(cubeTriList, sizeof(cubeTriList)));
+
+    const bx::Vec3 at = {0.0f, 0.0f, 0.0f};
+    const bx::Vec3 eye = {0.0f, 0.0f, -5.0f};
+    float view[16];
+    bx::mtxLookAt(view, eye, at);
+    float proj[16];
+    bx::mtxProj(proj, 60.0f, float(1280) / float(720), 0.1f, 100.0f, bgfx::getCaps()->homogeneousDepth);
+    bgfx::setViewTransform(0, view, proj);
+    float mtx[16];
+    bx::mtxRotateXY(mtx, glfwGetTime() * 0.1f, glfwGetTime() * 0.1f);
+    bgfx::setTransform(mtx);
+
+    // auto vbh = bgfx::createVertexBuffer(bgfx::makeRef(Util::quadVertices, sizeof(Util::quadVertices)), spriteVL);
+    // auto ibh = bgfx::createIndexBuffer(bgfx::makeRef(Util::quadIndices, sizeof(Util::quadIndices)));
+
+    // Set vertex and index buffer.
+    bgfx::setVertexBuffer(0, vbh);
+    bgfx::setIndexBuffer(ibh);
+
+    // Set render states.
+    bgfx::setState(BGFX_STATE_DEFAULT);
+
+    // Submit primitive for rendering to view 0.
+    bgfx::submit(0, shader);
+
     bgfx::frame();
 }
