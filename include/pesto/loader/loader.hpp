@@ -11,6 +11,27 @@
 
 #include <cstdio>
 
+#define IMPORT_COMPILED_SHADER(NAME) (include <vs_##NAME.sc.glsl.bin.h>)
+
+//#include <vs_name.sc.essl.bin.h>\
+//#include <vs_name.sc.spv.bin.h>\
+//#include <fs_name.sc.glsl.bin.h>\
+//#include <fs_name.sc.essl.bin.h>\
+//#include <fs_name.sc.spv.bin.h>\
+//#if defined(_WIN32)\
+//#include <vs_name.sc.dx9.bin.h>\
+//#include <vs_name.sc.dx11.bin.h>\
+//#include <fs_name.sc.dx9.bin.h>\
+//#include <fs_name.sc.dx11.bin.h>\
+//#endif //  defined(_WIN32)\
+//#if __APPLE__\
+//#include <vs_name.sc.mtl.bin.h>\
+//#include <fs_name.sc.mtl.bin.h>\
+//#endif // __APPLE__\
+
+
+#define LOAD_COMPILED_SHADER
+
 struct Loader
 {
     bx::FileReaderI *fileReader = nullptr;

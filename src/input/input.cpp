@@ -1,4 +1,4 @@
-#include "input.hpp"
+#include "input/input.hpp"
 #include "pesto.hpp"
 
 Input::Input(Application *mainApp)

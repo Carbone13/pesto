@@ -3,7 +3,7 @@
 #define GLFW_EXPOSE_NATIVE_WIN32
 
 #include "pesto.hpp"
-#include "renderer.hpp"
+#include "gfx/renderer.hpp"
 
 #include <iostream>
 

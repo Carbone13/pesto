@@ -1,4 +1,4 @@
-#include "window.hpp"
+#include "window/window.hpp"
 #include "pesto.hpp"
 
 #include <iostream>
