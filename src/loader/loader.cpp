@@ -1,5 +1,6 @@
 #include "loader/loader.hpp"
 #include "bgfx/bgfx.h"
+#include "bgfx/embedded_shader.h"
 #include "pesto.hpp"
 
 #include <ostream>
@@ -139,67 +140,4 @@ bgfx::TextureHandle Loader::loadTexture(const char *_name, uint64_t _flags, uint
                                         bimg::Orientation::Enum *_orientation)
 {
     return loadTexture(fileReader, _name, _flags, _skip, _info, _orientation);
-}
-
-bgfx::ShaderHandle Loader::loadShader(const char *_name)
-{
-    char filePath[512];
-
-    const char *shaderPath = "???";
-
-    switch (bgfx::getRendererType())
-    {
-    case bgfx::RendererType::Noop:
-    case bgfx::RendererType::Direct3D9:
-        shaderPath = "shaders/dx9/";
-        break;
-    case bgfx::RendererType::Direct3D11:
-    case bgfx::RendererType::Direct3D12:
-        shaderPath = "shaders/dx11/";
-        break;
-    case bgfx::RendererType::Agc:
-    case bgfx::RendererType::Gnm:
-        shaderPath = "shaders/pssl/";
-        break;
-    case bgfx::RendererType::Metal:
-        shaderPath = "shaders/metal/";
-        break;
-    case bgfx::RendererType::Nvn:
-        shaderPath = "shaders/nvn/";
-        break;
-    case bgfx::RendererType::OpenGL:
-        shaderPath = "shaders/glsl/";
-        break;
-    case bgfx::RendererType::OpenGLES:
-        shaderPath = "shaders/essl/";
-        break;
-    case bgfx::RendererType::Vulkan:
-        shaderPath = "shaders/spirv/";
-        break;
-    case bgfx::RendererType::WebGPU:
-        shaderPath = "shaders/spirv/";
-        break;
-
-    case bgfx::RendererType::Count:
-        BX_ASSERT(false, "You should not be here!");
-        break;
-    }
-
-    bx::strCopy(filePath, BX_COUNTOF(filePath), generatedDirectory);
-    bx::strCat(filePath, BX_COUNTOF(filePath), shaderPath);
-    bx::strCat(filePath, BX_COUNTOF(filePath), _name);
-    // bx::strCat(filePath, BX_COUNTOF(filePath), ".bin");
-
-    bgfx::ShaderHandle handle = bgfx::createShader(loadMem(filePath));
-    bgfx::setName(handle, _name);
-
-    return handle;
-}
-
-bgfx::ProgramHandle Loader::loadProgram(const char *PROGRAM)
-{
-    auto vsh = loadShader((std::string("vs_") + PROGRAM + std::string(".bin")).c_str());
-    auto fsh = loadShader((std::string("fs_") + PROGRAM + std::string(".bin")).c_str());
-
-    return bgfx::createProgram(vsh, fsh, true);
 }

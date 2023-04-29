@@ -11,7 +11,7 @@
 
 #include <cstdio>
 
-#define IMPORT_COMPILED_SHADER(NAME) (include <vs_##NAME.sc.glsl.bin.h>)
+#define IMPORT_COMPILED_SHADER(NAME) include<vs_##NAME.sc.glsl.bin.h>
 
 //#include <vs_name.sc.essl.bin.h>\
 //#include <vs_name.sc.spv.bin.h>\
@@ -28,9 +28,6 @@
 //#include <vs_name.sc.mtl.bin.h>\
 //#include <fs_name.sc.mtl.bin.h>\
 //#endif // __APPLE__\
-
-
-#define LOAD_COMPILED_SHADER
 
 struct Loader
 {
@@ -62,11 +59,19 @@ struct Loader
                                     uint8_t _skip = 0, bgfx::TextureInfo *_info = nullptr,
                                     bimg::Orientation::Enum *_orientation = NULL);
 
-    bgfx::ShaderHandle loadShader(const char *_name);
-    bgfx::ProgramHandle loadProgram(const char *PROGRAM);
-
     const bgfx::Memory *loadMem(const char *_filePath);
     void *loadMem(const char *_filePath, uint32_t *_size);
 };
+
+#define LOAD_PROGRAM(NAME)                                                                                             \
+    []() {                                                                                                             \
+        const bgfx::EmbeddedShader fs = BGFX_EMBEDDED_SHADER(fs_##NAME);                                               \
+        const bgfx::EmbeddedShader vs = BGFX_EMBEDDED_SHADER(vs_##NAME);                                               \
+        auto fs_handle =                                                                                               \
+            createEmbeddedShader(&fs, bgfx::getRendererType(), (std::stringstream() << "fs_" << #NAME).str().data());  \
+        auto vs_handle =                                                                                               \
+            createEmbeddedShader(&vs, bgfx::getRendererType(), (std::stringstream() << "vs_" << #NAME).str().data());  \
+        return bgfx::createProgram(vs_handle, fs_handle, true);                                                        \
+    }()
 
 #endif // PESTO_LOADER_HPP
