@@ -6,7 +6,8 @@ project(pesto)
 
 add_subdirectory(lib)
 
-include_directories(include/pesto)
+include_directories(include/pesto src/)
+
 include_directories(lib/bgfx.cmake/bgfx/include lib/bgfx.cmake/bx/include lib/bgfx.cmake/bimg/include)
 include_directories(lib/glfw/include lib/glm)
 

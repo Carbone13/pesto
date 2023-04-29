@@ -5,7 +5,7 @@
 
 struct Time
 {
-    float delta;
+    float delta = 0.0f;
     float fixedDelta = 1.0f / 30.0f;
 
     void poll()
@@ -23,7 +23,7 @@ struct Time
         accumulator -= fixedDelta;
     }
 
-    bool shouldPhysicsTick()
+    [[nodiscard]] bool shouldPhysicsTick() const
     {
         return accumulator >= fixedDelta;
     };
