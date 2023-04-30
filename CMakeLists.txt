@@ -16,8 +16,5 @@ file(GLOB_RECURSE SOURCES src/*.cpp)
 file(GLOB_RECURSE HEADERS src/*.hpp src/*.h include/*.hpp include/*.h)
 
 add_library(pesto STATIC ${SOURCES} ${HEADERS})
-# Needed for resources compilation
-add_dependencies(pesto bin2c texturec shaderc)
-
 target_link_libraries(pesto PUBLIC bgfx bx bimg bimg_decode glfw glm)
 target_include_directories(pesto PUBLIC include/)
