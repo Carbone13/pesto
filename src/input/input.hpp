@@ -3,16 +3,12 @@
 
 namespace pesto
 {
-    struct Application;
-
-    struct Input
+    struct Input : Server
     {
-        Application *app;
-
         bool keyPressed(int key);
         int getAxis(int keyA, int keyB);
 
-        Input(Application *mainApp);
+        explicit Input(Application *app);
     };
 }
 

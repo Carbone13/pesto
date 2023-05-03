@@ -1,13 +1,11 @@
-#include "window.hpp"
 #include "pesto.hpp"
 
 #include <iostream>
 
 namespace pesto
 {
-    WindowHandle::WindowHandle(Application *mainApp, int sizeX, int sizeY)
+    WindowHandle::WindowHandle(Application *app, int sizeX, int sizeY) : Server(app)
     {
-        app = mainApp;
         createWindow(sizeX, sizeY);
     }
 
@@ -31,10 +29,5 @@ namespace pesto
         {
             std::cerr << "[ERROR] Could not initialize GLFW Window" << std::endl;
         }
-    }
-
-    void WindowHandle::poll()
-    {
-        glfwPollEvents();
     }
 }

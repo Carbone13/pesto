@@ -1,44 +1,102 @@
-#include "GLFW/glfw3.h"
-#include "bgfx/bgfx.h"
 #define GLFW_EXPOSE_NATIVE_WIN32
-
 #include "pesto.hpp"
-#include "gfx/renderer.hpp"
+#include "renderer.hpp"
 
 #include <iostream>
-#include "resource_loading.hpp"
 
 namespace pesto
 {
-    Renderer::Renderer(Application *mainApp)
+    Renderer::Renderer(Application *app, int canvasWidth, int canvasHeight) : Server(app)
     {
-        app = mainApp;
-        initializeBgfx();
+        this->canvasWidth = canvasWidth;
+        this->canvasHeight = canvasHeight;
 
         spriteVL.begin();
         spriteVL.add(bgfx::Attrib::Position,2, bgfx::AttribType::Float);
         spriteVL.add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Int16, true, true);
         spriteVL.end();
-
-        //    meshVL.begin();
-        //    meshVL.add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float);
-        //    meshVL.add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Int16, true, true);
-        //    meshVL.end();
-        meshVL.begin()
-            .add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
-            .add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true)
-            .end();
     }
 
-    void Renderer::initializeBgfx()
+    void Renderer::prepare()
+    {
+        bgfx::touch(0);
+        app->camera.prepare();
+    }
+
+    void Renderer::submit()
+    {
+
+        // SPRITE BATCHING PASS
+        for(const auto& command : spriteBuffer)
+        {
+
+            TextureHandle texture = *command.first;
+            std::vector<Sprite*> sprites = command.second;
+
+
+
+            bgfx::InstanceDataBuffer idb{};
+            bgfx::allocInstanceDataBuffer(&idb, sprites.size(), stride);
+            uint8_t *data = idb.data;
+
+            for (auto spritePointer : sprites)
+            {
+                Sprite sprite = *spritePointer;
+
+                auto spriteArea = sprite.textureCoordinate;
+                auto scale = sprite.scale * vec2(spriteArea.z,spriteArea.w);
+
+                auto* mtx = (mat4x4*)(float*)data;
+
+                // translate
+                *mtx = translate(mat4x4{1.0f}, vec3(sprite.position, 0.0f));
+                // rotate (centered pivot)
+                *mtx = translate(*mtx, vec3(0.5f * scale.x, 0.5f * scale.y, 0.0f));
+                *mtx = rotate(*mtx, glm::radians(sprite.rotation), vec3(0.0f, 0.0f, 1.0f));
+                *mtx = translate(*mtx, vec3(-0.5f * scale.x, -0.5f * scale.y, 0.0f));
+                // scale
+                *mtx = glm::scale(*mtx, vec3(scale, 1.0f));
+
+                auto* area = (float*)&data[64];
+                area[0] = spriteArea.x / (float)sprite.texture->info.width;
+                area[1] = spriteArea.y / (float)sprite.texture->info.height;
+                area[2] = spriteArea.z / (float)sprite.texture->info.width;
+                area[3] = spriteArea.w / (float)sprite.texture->info.height;
+
+                data += stride;
+            }
+
+            // Set quad geometry
+            bgfx::setVertexBuffer(0, quadVBH);
+            bgfx::setIndexBuffer(quadIBH);
+            // Set batch texture and data
+            bgfx::setTexture(0, u_texture, texture);
+            bgfx::setInstanceDataBuffer(&idb);
+            // Set render states.
+            bgfx::setState(BGFX_STATE_DEFAULT);
+            // Submit primitive for rendering to view 0.
+            bgfx::submit(0, shader);
+        }
+
+
+        spriteBuffer.clear();
+        bgfx::frame();
+    }
+
+    void Renderer::initialize()
     {
         bgfx::Init i{};
         PlatformData pd{};
         pd.nwh = glfwGetWin32Window(app->windowHandle.window);
 
         i.type = bgfx::RendererType::Count; // automatically choose a renderer
-        i.resolution.width = 1280;
-        i.resolution.height = 720;
+
+        int width;
+        int height;
+        glfwGetWindowSize(app->windowHandle.window, &width, &height);
+
+        i.resolution.width = width;
+        i.resolution.height = height;
         i.resolution.reset = BGFX_RESET_VSYNC; // activate vsync
         i.platformData = pd;
 
@@ -47,50 +105,18 @@ namespace pesto
             std::cerr << "[FAIL] : Could not initialize BGFX" << std::endl;
         }
 
-        bgfx::reset(1280, 720, BGFX_RESET_VSYNC, i.resolution.format);
+        bgfx::reset(width, height, BGFX_RESET_VSYNC, i.resolution.format);
         bgfx::setDebug(BGFX_DEBUG_TEXT);
         bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x003030FF, 1.0f, 0);
         bgfx::setViewRect(0, 0, 0, bgfx::BackbufferRatio::Equal);
 
-        s_Texture = bgfx::createUniform("s_Texture", bgfx::UniformType::Sampler);
-    }
+        u_texture = bgfx::createUniform("u_texture", bgfx::UniformType::Sampler);
 
-    void Renderer::prepare()
+        quadVBH = bgfx::createVertexBuffer(bgfx::makeRef(surface::quadVertices, sizeof(surface::quadVertices)), Renderer::spriteVL);
+        quadIBH = bgfx::createIndexBuffer(bgfx::makeRef(surface::quadIndices, sizeof(surface::quadIndices)));
+    }
+    void Renderer::draw(Sprite *sprite)
     {
-        bgfx::touch(0);
+        spriteBuffer[&(sprite->texture->handle)].push_back(sprite);
     }
-
-    void Renderer::submit()
-    {
-        vbh = bgfx::createVertexBuffer(bgfx::makeRef(rendering::quadVertices, sizeof(rendering::quadVertices)), Renderer::spriteVL);
-        ibh = bgfx::createIndexBuffer(bgfx::makeRef(rendering::quadIndices, sizeof(rendering::quadIndices)));
-
-        const bx::Vec3 at = {0.0f, 0.0f, 0.0f};
-        const bx::Vec3 eye = {0.0f, 0.0f, -5.0f};
-        float view[16];
-        bx::mtxLookAt(view, eye, at);
-        float proj[16];
-        bx::mtxProj(proj, 60.0f, float(1280) / float(720), 0.1f, 1000.0f, bgfx::getCaps()->homogeneousDepth);
-        bgfx::setViewTransform(0, view, proj);
-        //float mtx[16];
-        //bx::mtxRotateXY(mtx, glfwGetTime() * 0.1f, glfwGetTime() * 0.1f);
-        //bgfx::setTransform(mtx);
-
-        bgfx::setTexture(0, s_Texture, textureHandle);
-
-        // Set vertex and index buffer.
-        bgfx::setVertexBuffer(0, vbh);
-        bgfx::setIndexBuffer(ibh);
-
-        // Set render states.
-        bgfx::setState(BGFX_STATE_DEFAULT);
-
-        // Submit primitive for rendering to view 0.
-        bgfx::submit(0, shader);
-
-        bgfx::frame();
-
-        destroy(vbh);
-        destroy(ibh);
     }
-}

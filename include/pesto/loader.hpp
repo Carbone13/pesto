@@ -2,6 +2,7 @@
 #define PESTO_RESOURCE_LOADING_HPP
 
 #include "bgfx/bgfx.h"
+#include "bgfx/embedded_shader.h"
 
 #include <bx/bx.h>
 #include <bx/file.h>
@@ -21,25 +22,43 @@ static bx::AllocatorI* getDefaultAllocator()
 
 namespace pesto::loader
 {
-const uint64_t pixelArtFlags =
-    BGFX_SAMPLER_MAG_POINT |
-    BGFX_SAMPLER_MIN_POINT |
-    BGFX_SAMPLER_UVW_CLAMP;
-
     static bx::FileReaderI* _fileReader = nullptr;
     static bx::AllocatorI* _allocator = getDefaultAllocator();
+    ////// TEXTURE LOADING
 
-    static void check ()
-    {
-        if (_fileReader == nullptr)
-        {
-            _fileReader = BX_NEW(_allocator, bx::FileReader);
-        }
-    }
+    /// Load a Texture from raw data
+    /// \param data Pointer to first byte of data
+    /// \param size Total size of data
+    /// \param name Name for BGFX debug
+    /// \param flags Texture flags
+    /// \param outputInfo Pointer to a TextureInfo
+    bgfx::TextureHandle textureFromData (const void *data, uint32_t size, const char *name, uint64_t flags = 0, bgfx::TextureInfo *outputInfo = nullptr);
+    /// Load a Texture from file (.bin, .dds, .jpg, .png...)
+    /// \param path Path to data file
+    /// \param name Name for BGFX debug
+    /// \param flags Texture flags
+    /// \param outputInfo Pointer to a TextureInfo
+    bgfx::TextureHandle textureFromFile (const char *path, const char *name, uint64_t flags = 0, bgfx::TextureInfo *outputInfo = nullptr);
 
-    bgfx::TextureHandle loadTexture(const char *_name, uint64_t _flags = BGFX_TEXTURE_NONE | BGFX_SAMPLER_NONE,
-                                uint8_t _skip = 0, bgfx::TextureInfo *_info = nullptr,
-                                bimg::Orientation::Enum *_orientation = nullptr);
+
+    ////// SHADER LOADING
+
+    /// Load a Shader from raw data
+    /// \param data Pointer to first byte of data
+    /// \param size Total size of data
+    /// \param name Name for BGFX debug
+    bgfx::ShaderHandle shaderFromData(const void *data, uint32_t size, const char *name);
+    /// Load a Shader from file (compiled .bin only !)
+    /// \param path Path to data file
+    /// \param name Name for BGFX debug
+    bgfx::ShaderHandle shaderFromFile(const char *path, const char *name);
+
+
+    bgfx::ProgramHandle programFromData (const void *v_data, uint32_t v_size, const char *v_name,
+                                         const void *f_data, uint32_t f_size, const char *f_name);
+    bgfx::ProgramHandle programFromFiles (const char *v_path, const char *v_name, const char *f_path, const char *f_name);
+    bgfx::ProgramHandle programFromEmbeddedShaders (bgfx::EmbeddedShader *v, const char *v_name, bgfx::EmbeddedShader *f, const char *f_name);
+
 } // namespace pesto
 
 

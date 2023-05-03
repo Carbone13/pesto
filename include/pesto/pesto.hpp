@@ -5,11 +5,7 @@
 #include "../../src/input/input.hpp"
 #include "../../src/time.hpp"
 #include "../../src/window/window.hpp"
-
-#include <bx/bx.h>
-#include <bx/file.h>
-#include <bx/sort.h>
-#include <bimg/decode.h>
+#include "../../src/camera/camera.hpp"
 
 #include <cstdio>
 #include <iostream>
@@ -19,16 +15,21 @@ namespace pesto
     #define DEFAULT_WINDOW_WIDTH 1280
     #define DEFAULT_WINDOW_HEIGHT 720
 
+    #define DEFAULT_CANVAS_WIDTH 128
+    #define DEFAULT_CANVAS_HEIGHT 72
+
     struct Application
     {
         WindowHandle windowHandle {this, DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT};
-        Renderer renderer {this};
+        Renderer renderer {this, DEFAULT_CANVAS_WIDTH, DEFAULT_CANVAS_HEIGHT};
+        Camera camera {this};
         Input input {this};
         Time time {};
 
         Application()
         {
-            _fileReader = BX_NEW(_allocator, bx::FileReader);
+            renderer.initialize();
+            camera.initialize();
         }
 
         void run()
@@ -37,7 +38,7 @@ namespace pesto
             while (!glfwWindowShouldClose(windowHandle.window))
             {
                 // Beginning
-                pesto::WindowHandle::poll();
+                glfwPollEvents();
                 time.poll();
 
                 // Logic
@@ -65,25 +66,6 @@ namespace pesto
         {
             glfwSetWindowShouldClose(windowHandle.window, 1); // exit
         }
-
-        bx::FileReaderI* getFileReader() { return _fileReader; }
-        bx::AllocatorI*  getAllocator() { return _allocator; }
-
-      private:
-        bx::FileReaderI* _fileReader = nullptr;
-        bx::AllocatorI* _allocator = getDefaultAllocator();
-
-        static bx::AllocatorI* getDefaultAllocator()
-        {
-            BX_PRAGMA_DIAGNOSTIC_PUSH();
-            BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4459); // warning C4459: declaration of 'allocator' hides global declaration
-
-            static bx::DefaultAllocator allocator;
-            return &allocator;
-
-            BX_PRAGMA_DIAGNOSTIC_POP();
-        }
-
     };
 } // namespace pesto
 

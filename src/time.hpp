@@ -3,34 +3,46 @@
 
 #include "GLFW/glfw3.h"
 
-struct Time
+namespace pesto
 {
-    float delta = 0.0f;
-    float fixedDelta = 1.0f / 30.0f;
-
-    void poll()
+    class Time
     {
-        auto now = static_cast<float>(glfwGetTime());
+        float lastTime{0};
+        float accumulator{0};
 
-        delta = now - lastTime;
-        lastTime = now;
+        float delta{0};
+        float fixedDelta = 1.0f / 30.0f;
 
-        accumulator += delta;
-    }
+      public:
+        [[nodiscard]] float deltaTime() const
+        {
+            return delta;
+        }
+        [[nodiscard]] float fixedDeltaTime() const
+        {
+            return fixedDelta;
+        }
 
-    void registerOneTick()
-    {
-        accumulator -= fixedDelta;
-    }
+        void poll()
+        {
+            auto now = static_cast<float>(glfwGetTime());
 
-    [[nodiscard]] bool shouldPhysicsTick() const
-    {
-        return accumulator >= fixedDelta;
+            delta = now - lastTime;
+            lastTime = now;
+
+            accumulator += delta;
+        }
+
+        void registerOneTick()
+        {
+            accumulator -= fixedDelta;
+        }
+
+        [[nodiscard]] bool shouldPhysicsTick() const
+        {
+            return accumulator >= fixedDelta;
+        }
     };
-
-  private:
-    float lastTime{0};
-    float accumulator{0};
-};
+} // namespace pesto
 
 #endif // PESTO_TIME_HPP

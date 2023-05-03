@@ -2,22 +2,18 @@
 #define WINDOW_HPP
 
 #include "GLFW/glfw3.h"
+#include "../server.hpp"
 
 namespace pesto
 {
-    struct Application;
-
-    struct WindowHandle
+    class WindowHandle : Server
     {
-        Application *app;
-        GLFWwindow *window{nullptr};
-
-        WindowHandle(Application *mainApp, int sizeX, int sizeY);
-
-        static void poll();
-
-      private:
         void createWindow(int sizeX, int sizeY);
+
+      public:
+        WindowHandle(Application *app, int sizeX, int sizeY);
+
+        GLFWwindow *window{nullptr};
     };
 }
 

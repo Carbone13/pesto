@@ -3,43 +3,52 @@
 
 #include <cstdint>
 
+#include "../server.hpp"
 #include "GLFW/glfw3.h"
 #include "GLFW/glfw3native.h"
 #include "bgfx/bgfx.h"
 #include "glm/glm.hpp"
+#include "sprite.hpp"
+#include "texture.hpp"
+#include "vector"
+#include "map"
 
 using namespace glm;
 using namespace bgfx;
 
 namespace pesto
 {
-    struct Application;
-
-    struct Renderer
+    class Renderer : Server
     {
-        Application *app;
+        VertexLayout spriteVL; // 2D Vertex Layout
 
-        explicit Renderer(Application *mainApp);
+        UniformHandle u_texture {kInvalidHandle};
 
-        void initializeBgfx();
+        VertexBufferHandle quadVBH {kInvalidHandle};
+        IndexBufferHandle quadIBH {kInvalidHandle};
 
+        std::map<TextureHandle*, std::vector<Sprite*>> spriteBuffer;
+
+        int stride = 64 + 16;
+
+      public:
+
+        int canvasWidth;
+        int canvasHeight;
+
+        ProgramHandle shader {kInvalidHandle};
+        TextureHandle textureHandle {kInvalidHandle};
+
+        Renderer(Application *app, int canvasWidth, int canvasHeight);
+
+        void initialize();
         void prepare();
         void submit();
 
-        VertexLayout spriteVL; // 2D Vertex Layout
-        VertexLayout meshVL;   // 3D Vertex Layout
-
-        UniformHandle s_Texture;
-
-        TextureHandle textureHandle;
-
-        VertexBufferHandle vbh;
-        IndexBufferHandle ibh;
-
-        ProgramHandle shader;
+        void draw (Sprite *sprite);
     };
 
-    namespace rendering
+    namespace surface
     {
         struct Vertex2D
         {
@@ -47,22 +56,21 @@ namespace pesto
             float y;
             int16_t u;
             int16_t v;
-
-            Vertex2D(float x, float y, int16_t u, int16_t v) : x(x), y(y), u(u), v(v)
-            {
-            }
         };
 
         const Vertex2D quadVertices[] = {
             // pos       // tex
-            {-1.0f, 1.0f, 0, 0},
-            {1.0f, -1.0f, 0x7fff, 0x7fff},
-            {-1.0f, -1.0f, 0, 0x7fff},
-            {1.0f, 1.0f, 0x7fff, 0},
+            {0.0f, 1.0f, 0, 0x7fff},
+            {1.0f, 0.0f, 0x7fff, 0},
+            {0.0f, 0.0f, 0, 0},
+            {1.0f, 1.0f, 0x7fff, 0x7fff},
         };
 
-        const uint16_t quadIndices[6]{0, 2, 3, 3, 2, 1};
-    } // namespace rendering
+        const uint16_t quadIndices[6] {
+            0, 1, 2,
+            0, 3, 1
+        };
+    } // namespace surface
+} // namespace pesto
 
-    } // namespace pesto
 #endif // RENDER_HPP
