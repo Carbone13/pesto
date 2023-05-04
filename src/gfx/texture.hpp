@@ -9,6 +9,8 @@ namespace pesto
     {
         bgfx::TextureHandle handle;
         bgfx::TextureInfo info;
+
+        Texture (bgfx::TextureHandle handle, bgfx::TextureInfo info) : handle(handle), info(info) {}
     };
 }
 

@@ -6,6 +6,7 @@ namespace pesto
     struct Input : Server
     {
         bool keyPressed(int key);
+
         int getAxis(int keyA, int keyB);
 
         explicit Input(Application *app);

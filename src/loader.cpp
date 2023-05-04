@@ -56,23 +56,25 @@ static void unload(void *_ptr)
 }
 
 /// FUNCTIONS
-bgfx::TextureHandle textureFromFile(const char *path, const char *name, uint64_t flags, bgfx::TextureInfo *outputInfo)
+pesto::Texture textureFromFile(const char *path, const char *name, uint64_t flags)
 {
     check();
 
     uint32_t size;
     void *data = load(_fileReader, _allocator, path, &size);
 
-    bgfx::TextureHandle handle = textureFromData(data, size, name, flags, outputInfo);
+    pesto::Texture handle = textureFromData(data, size, name, flags);
 
     unload(data);
 
     return handle;
 }
 
-bgfx::TextureHandle textureFromData(const void *data, uint32_t size, const char *name, uint64_t flags, bgfx::TextureInfo *outputInfo)
+pesto::Texture textureFromData(const void *data, uint32_t size, const char *name, uint64_t flags)
 {
     bgfx::TextureHandle handle = BGFX_INVALID_HANDLE;
+    bgfx::TextureInfo info {};
+
     bimg::ImageContainer *imageContainer = bimg::imageParse(_allocator, data, size);
 
     if (nullptr != imageContainer)
@@ -93,16 +95,15 @@ bgfx::TextureHandle textureFromData(const void *data, uint32_t size, const char 
             bgfx::setName(handle, name);
         }
 
-        if (outputInfo != nullptr)
-        {
-            bgfx::calcTextureSize(*outputInfo, uint16_t(imageContainer->m_width), uint16_t(imageContainer->m_height),
-                                  uint16_t(imageContainer->m_depth), imageContainer->m_cubeMap,
-                                  1 < imageContainer->m_numMips, imageContainer->m_numLayers,
-                                  bgfx::TextureFormat::Enum(imageContainer->m_format));
-        }
+
+        bgfx::calcTextureSize(info, uint16_t(imageContainer->m_width), uint16_t(imageContainer->m_height),
+                              uint16_t(imageContainer->m_depth), imageContainer->m_cubeMap,
+                              1 < imageContainer->m_numMips, imageContainer->m_numLayers,
+                              bgfx::TextureFormat::Enum(imageContainer->m_format));
+
     }
 
-    return handle;
+    return pesto::Texture{handle, info};
 }
 
 bgfx::ShaderHandle shaderFromFile(const char *path, const char *name)

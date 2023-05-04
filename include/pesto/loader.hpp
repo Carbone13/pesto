@@ -1,6 +1,8 @@
 #ifndef PESTO_RESOURCE_LOADING_HPP
 #define PESTO_RESOURCE_LOADING_HPP
 
+#include "../../src/gfx/texture.hpp"
+
 #include "bgfx/bgfx.h"
 #include "bgfx/embedded_shader.h"
 
@@ -32,13 +34,13 @@ namespace pesto::loader
     /// \param name Name for BGFX debug
     /// \param flags Texture flags
     /// \param outputInfo Pointer to a TextureInfo
-    bgfx::TextureHandle textureFromData (const void *data, uint32_t size, const char *name, uint64_t flags = 0, bgfx::TextureInfo *outputInfo = nullptr);
+    pesto::Texture textureFromData (const void *data, uint32_t size, const char *name, uint64_t flags = 0);
     /// Load a Texture from file (.bin, .dds, .jpg, .png...)
     /// \param path Path to data file
     /// \param name Name for BGFX debug
     /// \param flags Texture flags
     /// \param outputInfo Pointer to a TextureInfo
-    bgfx::TextureHandle textureFromFile (const char *path, const char *name, uint64_t flags = 0, bgfx::TextureInfo *outputInfo = nullptr);
+    pesto::Texture textureFromFile (const char *path, const char *name, uint64_t flags = 0);
 
 
     ////// SHADER LOADING

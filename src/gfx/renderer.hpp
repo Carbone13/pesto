@@ -10,8 +10,11 @@
 #include "glm/glm.hpp"
 #include "sprite.hpp"
 #include "texture.hpp"
+
+#include "deque"
 #include "vector"
 #include "map"
+#include "stack"
 
 using namespace glm;
 using namespace bgfx;
@@ -27,7 +30,7 @@ namespace pesto
         VertexBufferHandle quadVBH {kInvalidHandle};
         IndexBufferHandle quadIBH {kInvalidHandle};
 
-        std::map<TextureHandle*, std::vector<Sprite*>> spriteBuffer;
+        std::map<TextureHandle*, std::stack<Sprite*>> spriteBuffer;
 
         int stride = 64 + 16;
 

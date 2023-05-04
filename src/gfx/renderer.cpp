@@ -17,72 +17,6 @@ namespace pesto
         spriteVL.end();
     }
 
-    void Renderer::prepare()
-    {
-        bgfx::touch(0);
-        app->camera.prepare();
-    }
-
-    void Renderer::submit()
-    {
-
-        // SPRITE BATCHING PASS
-        for(const auto& command : spriteBuffer)
-        {
-
-            TextureHandle texture = *command.first;
-            std::vector<Sprite*> sprites = command.second;
-
-
-
-            bgfx::InstanceDataBuffer idb{};
-            bgfx::allocInstanceDataBuffer(&idb, sprites.size(), stride);
-            uint8_t *data = idb.data;
-
-            for (auto spritePointer : sprites)
-            {
-                Sprite sprite = *spritePointer;
-
-                auto spriteArea = sprite.textureCoordinate;
-                auto scale = sprite.scale * vec2(spriteArea.z,spriteArea.w);
-
-                auto* mtx = (mat4x4*)(float*)data;
-
-                // translate
-                *mtx = translate(mat4x4{1.0f}, vec3(sprite.position, 0.0f));
-                // rotate (centered pivot)
-                *mtx = translate(*mtx, vec3(0.5f * scale.x, 0.5f * scale.y, 0.0f));
-                *mtx = rotate(*mtx, glm::radians(sprite.rotation), vec3(0.0f, 0.0f, 1.0f));
-                *mtx = translate(*mtx, vec3(-0.5f * scale.x, -0.5f * scale.y, 0.0f));
-                // scale
-                *mtx = glm::scale(*mtx, vec3(scale, 1.0f));
-
-                auto* area = (float*)&data[64];
-                area[0] = spriteArea.x / (float)sprite.texture->info.width;
-                area[1] = spriteArea.y / (float)sprite.texture->info.height;
-                area[2] = spriteArea.z / (float)sprite.texture->info.width;
-                area[3] = spriteArea.w / (float)sprite.texture->info.height;
-
-                data += stride;
-            }
-
-            // Set quad geometry
-            bgfx::setVertexBuffer(0, quadVBH);
-            bgfx::setIndexBuffer(quadIBH);
-            // Set batch texture and data
-            bgfx::setTexture(0, u_texture, texture);
-            bgfx::setInstanceDataBuffer(&idb);
-            // Set render states.
-            bgfx::setState(BGFX_STATE_DEFAULT);
-            // Submit primitive for rendering to view 0.
-            bgfx::submit(0, shader);
-        }
-
-
-        spriteBuffer.clear();
-        bgfx::frame();
-    }
-
     void Renderer::initialize()
     {
         bgfx::Init i{};
@@ -115,8 +49,76 @@ namespace pesto
         quadVBH = bgfx::createVertexBuffer(bgfx::makeRef(surface::quadVertices, sizeof(surface::quadVertices)), Renderer::spriteVL);
         quadIBH = bgfx::createIndexBuffer(bgfx::makeRef(surface::quadIndices, sizeof(surface::quadIndices)));
     }
+
+    void Renderer::prepare()
+    {
+        bgfx::touch(0);
+        app->camera.prepare();
+    }
+
+    void Renderer::submit()
+    {
+        // SPRITE BATCHING
+        bgfx::setVertexBuffer(0, quadVBH);
+        bgfx::setIndexBuffer(quadIBH);
+
+        for(auto& command : spriteBuffer)
+        {
+            TextureHandle texture = *command.first;
+            auto sprites = &command.second;
+
+            // Set batch texture
+            bgfx::setTexture(0, u_texture, texture);
+
+            while(!sprites->empty())
+            {
+                auto maxSpriteInCall = bgfx::getAvailInstanceDataBuffer(sprites->size(), stride);
+
+                bgfx::InstanceDataBuffer idb{};
+                bgfx::allocInstanceDataBuffer(&idb, maxSpriteInCall, stride);
+                uint8_t *data = idb.data;
+
+                for (int i = 0; i < maxSpriteInCall; i++)
+                {
+                    Sprite sprite = *sprites->top();
+                    sprites->pop();
+
+                    auto spriteArea = sprite.textureCoordinate;
+                    auto scale = sprite.scale * vec2(spriteArea.z,spriteArea.w);
+
+                    auto* mtx = (mat4x4*)(float*)data;
+
+                    // translate
+                    *mtx = translate(mat4x4{1.0f}, vec3(sprite.position, 0.0f));
+                    // rotate (centered pivot)
+                    *mtx = translate(*mtx, vec3(0.5f * scale.x, 0.5f * scale.y, 0.0f));
+                    *mtx = rotate(*mtx, glm::radians(sprite.rotation), vec3(0.0f, 0.0f, 1.0f));
+                    *mtx = translate(*mtx, vec3(-0.5f * scale.x, -0.5f * scale.y, 0.0f));
+                    // scale
+                    *mtx = glm::scale(*mtx, vec3(scale, 1.0f));
+
+                    auto* area = (float*)&data[64];
+                    area[0] = spriteArea.x / (float)sprite.texture->info.width;
+                    area[1] = spriteArea.y / (float)sprite.texture->info.height;
+                    area[2] = spriteArea.z / (float)sprite.texture->info.width;
+                    area[3] = spriteArea.w / (float)sprite.texture->info.height;
+
+                    data += stride;
+                }
+
+                bgfx::setInstanceDataBuffer(&idb);
+                // Set render states.
+                bgfx::setState(BGFX_STATE_DEFAULT);
+                // Submit primitive for rendering to view 0.
+                bgfx::submit(0, shader);
+            }
+        }
+
+        bgfx::frame();
+    }
+
     void Renderer::draw(Sprite *sprite)
     {
-        spriteBuffer[&(sprite->texture->handle)].push_back(sprite);
+        spriteBuffer[&(sprite->texture->handle)].push(sprite);
     }
-    }
+}

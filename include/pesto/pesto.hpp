@@ -15,8 +15,8 @@ namespace pesto
     #define DEFAULT_WINDOW_WIDTH 1280
     #define DEFAULT_WINDOW_HEIGHT 720
 
-    #define DEFAULT_CANVAS_WIDTH 128
-    #define DEFAULT_CANVAS_HEIGHT 72
+    #define DEFAULT_CANVAS_WIDTH 16*3
+    #define DEFAULT_CANVAS_HEIGHT 9*3
 
     struct Application
     {

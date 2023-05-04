@@ -1,9 +1,11 @@
 #include "pesto.hpp"
+#include "input.hpp"
 
 namespace pesto
 {
     Input::Input(Application *app) : Server(app)
     {
+
     }
 
     bool Input::keyPressed(int key)
@@ -22,4 +24,6 @@ namespace pesto
 
         return v;
     }
-}
+
+
+    }
