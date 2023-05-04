@@ -6,4 +6,4 @@
 	url = https://github.com/g-truc/glm
 [submodule "lib/bgfx.cmake"]
 	path = lib/bgfx.cmake
-	url = https://github.com/Carbone13/bgfx.cmake
+	url = https://github.com/bkaradzic/bgfx.cmake
