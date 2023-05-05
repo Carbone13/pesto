@@ -14,23 +14,17 @@ using namespace glm;
 
 namespace pesto
 {
-    class Camera : Object
+    class Camera : public Object
     {
         vec2 screenSize{-1.0, -1.0f};
 
         mat4 view{1.0f};
         mat4 proj{1.0f};
 
-        vec2 oldPosition{0.0f, 0.0f};
-
         void recalculate();
+        void onTransformChanged () override;
 
       public:
-        [[nodiscard]] vec2 getPosition() const
-        {
-            return position;
-        }
-        void setPosition(vec2 _position);
 
         void initialize();
         void prepare();

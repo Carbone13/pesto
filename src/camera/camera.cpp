@@ -2,24 +2,18 @@
 
 namespace pesto
 {
-    void Camera::setPosition(glm::vec2 _position)
+    void Camera::onTransformChanged()
     {
-        oldPosition = position;
-        position = _position;
+        recalculate();
     }
 
     void Camera::recalculate()
     {
-        view = glm::translate(glm::mat4(1.0f), glm::vec3(-position.x, position.y, 0.0f));
+        view = glm::translate(glm::mat4(1.0f), glm::vec3(-getPosition().x, getPosition().y, 0.0f));
     }
 
     void Camera::prepare()
     {
-        if (oldPosition != position)
-        {
-            recalculate();
-        }
-
         bgfx::setViewTransform(0, reinterpret_cast<void *>(&view), reinterpret_cast<void *>(&proj));
 
         int width;
@@ -31,7 +25,6 @@ namespace pesto
 
     Camera::Camera(Application *app) : Object(app)
     {
-
     }
 
     void Camera::initialize()
