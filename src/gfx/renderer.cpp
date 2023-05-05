@@ -113,7 +113,8 @@ namespace pesto
 
             bgfx::setInstanceDataBuffer(&idb);
             // Set render states.
-            bgfx::setState(BGFX_STATE_DEFAULT);
+            constexpr uint64_t state = BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_BLEND_ALPHA;
+            bgfx::setState(state);
             // Submit primitive for rendering to view 0.
             bgfx::submit(0, shader);
         }
