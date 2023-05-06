@@ -1,20 +1,37 @@
 cmake_minimum_required(VERSION 3.23)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+include(cmake/AssetCompiler.cmake)
 set(CMAKE_CXX_STANDARD 17)
-
 project(pesto)
 
+# add dependencies
 add_subdirectory(lib)
-
 include_directories(include/pesto src/)
 
-include_directories(lib/bgfx.cmake/bgfx/include lib/bgfx.cmake/bx/include lib/bgfx.cmake/bimg/include)
-include_directories(lib/glfw/include lib/glm)
+# compile pesto
+add_library(pesto STATIC
+        # Headers
+        include/pesto/pesto.hpp
+        include/pesto/loader.hpp
+        src/camera/camera.hpp
+        src/gfx/renderer.hpp
+        src/gfx/sprite.hpp
+        src/gfx/texture.hpp
+        src/input/input.hpp
+        src/object/object.hpp
+        src/window/window.hpp
+        src/time.hpp
+        src/server.hpp
+        # Sources
+        src/camera/camera.cpp
+        src/gfx/renderer.cpp
+        src/input/input.cpp
+        src/object/object.cpp
+        src/window/window.cpp
+        src/loader.cpp)
 
-# PESTO
-file(GLOB_RECURSE SOURCES src/*.cpp)
-file(GLOB_RECURSE HEADERS src/*.hpp src/*.h include/*.hpp include/*.h)
-
-add_library(pesto STATIC ${SOURCES} ${HEADERS})
 target_link_libraries(pesto PUBLIC bgfx bx bimg bimg_decode glfw glm)
-target_include_directories(pesto PUBLIC include/)
+
+target_include_directories(pesto PUBLIC include)
+target_include_directories(pesto PRIVATE src)
+
+add_subdirectory(test)
