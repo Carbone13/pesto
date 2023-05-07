@@ -21,6 +21,7 @@ add_library(pesto STATIC
         src/window/window.hpp
         src/time.hpp
         src/server.hpp
+        src/initializer.hpp
         # Sources
         src/camera/camera.cpp
         src/gfx/renderer.cpp

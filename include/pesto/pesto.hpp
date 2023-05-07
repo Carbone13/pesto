@@ -1,35 +1,37 @@
 #ifndef PESTO_HPP
 #define PESTO_HPP
 
-#include "../../src/gfx/renderer.hpp"
-#include "../../src/input/input.hpp"
-#include "../../src/time.hpp"
-#include "../../src/window/window.hpp"
-#include "../../src/camera/camera.hpp"
+#include "initializer.hpp"
 
-#include <cstdio>
-#include <iostream>
+#include "gfx/renderer.hpp"
+#include "input/input.hpp"
+#include "window/window.hpp"
+#include "camera/camera.hpp"
+#include "time.hpp"
 
 namespace pesto
 {
-    #define DEFAULT_WINDOW_WIDTH 1280
-    #define DEFAULT_WINDOW_HEIGHT 720
-
-    #define DEFAULT_CANVAS_WIDTH 16*3
-    #define DEFAULT_CANVAS_HEIGHT 9*3
-
     struct Application
     {
-        WindowHandle windowHandle {this, DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT};
-        Renderer renderer {this, DEFAULT_CANVAS_WIDTH, DEFAULT_CANVAS_HEIGHT};
-        Camera camera {this};
-        Input input {this};
-        Time time {};
+        WindowHandle windowHandle;
+        Renderer renderer;
+        Camera camera;
+        Input input;
+        Time time;
 
-        Application()
+        explicit Application(Initializer initializer)
         {
+            windowHandle = WindowHandle{this, initializer};
+
+            renderer = Renderer{this, initializer};
             renderer.initialize();
+
+            camera = Camera{this};
             camera.initialize();
+
+            input = Input{this};
+
+            time = Time{};
         }
 
         void run()
@@ -84,4 +86,8 @@ namespace pesto
 (std::stringstream() << title \
 << number).str().c_str()))
 
+#define DEBUG_OUT_OF(title, number, max, nb) \
+(bgfx::dbgTextPrintf(0, nb, ((0x2 + nb) << 4) | 0xF, \
+(std::stringstream() << title \
+<< number << "/" << max).str().c_str()))
 #endif // !PESTO_HPP

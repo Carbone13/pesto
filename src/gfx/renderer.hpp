@@ -21,8 +21,16 @@ using namespace bgfx;
 
 namespace pesto
 {
+    enum SpriteBatchingMethod {
+        Transient,
+        Instanced,
+        Naive
+    };
+
     class Renderer : Server
     {
+        Initializer _initializer;
+
         VertexLayout spriteVL; // 2D Vertex Layout
 
         UniformHandle u_texture {kInvalidHandle};
@@ -36,13 +44,14 @@ namespace pesto
 
       public:
 
-        int canvasWidth;
-        int canvasHeight;
+        bool useTransient = false;
+        int canvasWidth = -1;
+        int canvasHeight = -1;
 
         ProgramHandle shader {kInvalidHandle};
-        TextureHandle textureHandle {kInvalidHandle};
 
-        Renderer(Application *app, int canvasWidth, int canvasHeight);
+        Renderer() = default;
+        Renderer(Application *app, Initializer initializer);
 
         void initialize();
         void prepare();

@@ -8,9 +8,11 @@ namespace pesto
     class Server
     {
       public:
+        Server() = default;
         explicit Server(Application *app) { this->app = app; }
+
       protected:
-        Application *app;
+        Application *app {nullptr};
     };
 }
 

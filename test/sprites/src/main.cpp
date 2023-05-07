@@ -1,8 +1,5 @@
 #include <iostream>
 
-#include "GLFW/glfw3.h"
-#include "bgfx/embedded_shader.h"
-
 #include "pesto/loader.hpp"
 #include "pesto/pesto.hpp"
 
@@ -20,11 +17,12 @@ int main()
     std::mt19937 mt(rd());
     std::uniform_real_distribution<double> dist(0.0, 50.0);
 
-    pesto::Application app = {};
+    pesto::Initializer initializer {};
+    pesto::Application app {initializer};
 
     pesto::Texture frogTexture = pesto::loader::textureFromData(frog_png, sizeof(frog_png), "frog", BGFX_SAMPLER_MAG_POINT | bgfx::TextureFormat::RGBA32F);
 
-    for (int i = 0; i < 70000; ++i)
+    for (int i = 0; i < 500000; ++i)
     {
         pesto::Sprite sprite {};
         sprite.texture = &frogTexture;
@@ -61,13 +59,6 @@ void pesto::Application::update()
     }
 }
 
-void pesto::Application::tick()
-{
-    DEBUG_MILLISECONDS("FRAME: ", this->time.deltaTime(), 0);
-    DEBUG_NUMBER("FPS: ", round(1.00f / this->time.deltaTime()), 1);
-    DEBUG_NUMBER("DRAW CALL: ", bgfx::getStats()->numDraw, 2);
-    DEBUG_NUMBER("MEMORY: ", bgfx::getStats()->gpuMemoryUsed, 3);
-}
 
 void pesto::Application::draw()
 {
@@ -75,4 +66,12 @@ void pesto::Application::draw()
     {
         renderer.draw(&i);
     }
+}
+
+void pesto::Application::tick()
+{
+    DEBUG_MILLISECONDS("FRAME: ", this->time.deltaTime(), 0);
+    DEBUG_NUMBER("DRAW CALL: ", bgfx::getStats()->numDraw, 1);
+    DEBUG_OUT_OF("GPU MEM (MB) : ", round(bgfx::getStats()->gpuMemoryUsed / 1000000.0f), round(bgfx::getStats()->gpuMemoryMax / 1000000.0f), 2);
+    DEBUG_NUMBER("VERT MEM (MB): ", round(bgfx::getStats()->transientVbUsed / 1000000.0f), 3);
 }

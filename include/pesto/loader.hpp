@@ -63,17 +63,4 @@ namespace pesto::loader
 
 } // namespace pesto
 
-
-
-#define LOAD_PROGRAM(NAME)                                                                                             \
-        []() {                                                                                                             \
-            const bgfx::EmbeddedShader fs = BGFX_EMBEDDED_SHADER(fs_##NAME);                                               \
-            const bgfx::EmbeddedShader vs = BGFX_EMBEDDED_SHADER(vs_##NAME);                                               \
-            auto fs_handle =                                                                                               \
-                createEmbeddedShader(&fs, bgfx::getRendererType(), (std::stringstream() << "fs_" << #NAME).str().data());  \
-            auto vs_handle =                                                                                               \
-                createEmbeddedShader(&vs, bgfx::getRendererType(), (std::stringstream() << "vs_" << #NAME).str().data());  \
-            return bgfx::createProgram(vs_handle, fs_handle, true);                                                        \
-        }()
-
 #endif // PESTO_RESOURCE_LOADING_HPP

@@ -15,6 +15,7 @@ namespace pesto
     class Object
     {
       public:
+        Object () = default;
         explicit Object(Application *app) { this->app = app; }
 
         void setPosition(vec2 new_position)

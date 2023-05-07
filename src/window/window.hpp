@@ -1,20 +1,19 @@
-#ifndef WINDOW_HPP
-#define WINDOW_HPP
+#ifndef PESTO_WINDOW_HPP
+#define PESTO_WINDOW_HPP
 
 #include "GLFW/glfw3.h"
 #include "../server.hpp"
 
 namespace pesto
 {
-    class WindowHandle : Server
+    class WindowHandle : public Server
     {
-        void createWindow(int sizeX, int sizeY);
-
       public:
-        WindowHandle(Application *app, int sizeX, int sizeY);
+        WindowHandle () = default;
+        WindowHandle(Application *app, Initializer initializer);
 
         GLFWwindow *window{nullptr};
     };
 }
 
-#endif // !WINDOW_HPP
+#endif // PESTO_WINDOW_HPP

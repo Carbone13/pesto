@@ -9,6 +9,7 @@ namespace pesto
 
         int getAxis(int keyA, int keyB);
 
+        Input () = default;
         explicit Input(Application *app);
     };
 }

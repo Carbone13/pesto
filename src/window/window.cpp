@@ -4,12 +4,7 @@
 
 namespace pesto
 {
-    WindowHandle::WindowHandle(Application *app, int sizeX, int sizeY) : Server(app)
-    {
-        createWindow(sizeX, sizeY);
-    }
-
-    void WindowHandle::createWindow(int sizeX, int sizeY)
+    WindowHandle::WindowHandle(Application *app, Initializer initializer) : Server(app)
     {
         if (glfwInit() == GLFW_FALSE)
         {
@@ -23,7 +18,7 @@ namespace pesto
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
-        window = glfwCreateWindow(sizeX, sizeY, "Pesto Application", nullptr, nullptr);
+        window = glfwCreateWindow(initializer.windowWidth, initializer.windowHeight, initializer.windowName, nullptr, nullptr);
 
         if (!window)
         {

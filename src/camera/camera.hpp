@@ -29,6 +29,7 @@ namespace pesto
         void initialize();
         void prepare();
 
+        Camera () = default;
         explicit Camera(Application *app);
     };
 }
